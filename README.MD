@@ -1,24 +1,32 @@
-# To-Do Manager
+﻿# To-Do Manager
 
-## Overview
-A console-based To-Do Manager built using Python that allows users to create, update, delete, and manage tasks with priority levels.
+A Streamlit-based task manager with dedicated page modules for adding, viewing, editing, completing, deleting, and analyzing tasks.
 
-## Features
-- Add Tasks
-- Update Tasks
-- Delete Tasks
-- Mark Tasks Complete
-- Filter Tasks by Priority
-- JSON-based Storage
+## Run the app
 
-## Technologies Used
-- Python
-- JSON
+1. Install dependencies:
+   ```powershell
+   pip install -r requirements.txt
+   ```
+2. Start the Streamlit app:
+   ```powershell
+   streamlit run app.py
+   ```
 
-## How to Run
-python main.py
+## File structure
 
-## Future Improvements
-- Due Dates
-- Task Categories
-- GUI Version
+- `app.py` — root landing page
+- `pages/1_Add_Task.py` — add a new task
+- `pages/2_View_Tasks.py` — browse and filter tasks
+- `pages/3_Edit_Task.py` — edit an existing task
+- `pages/4_Complete_Task.py` — mark a task complete
+- `pages/5_Delete_Task.py` — delete a task
+- `pages/6_Analytics.py` — view analytics and charts
+- `Main.py` — legacy CLI interface
+- `tasks.json` — task storage
+- `requirements.txt` — Python dependencies
+
+## Notes
+
+- `Main.py` is preserved as a console fallback.
+- `tasks.json` is created automatically when tasks are added.

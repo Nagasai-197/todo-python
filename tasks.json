@@ -1,6 +1,12 @@
 {
     "task1": {
+        "status": "Complete",
+        "priority": "High",
+        "due_date": "12-06-2026"
+    },
+    "task2": {
         "status": "Incomplete",
-        "priority": "High"
+        "priority": "Medium",
+        "due_date": "13-06-2026"
     }
 }
