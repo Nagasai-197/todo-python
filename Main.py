@@ -1,24 +1,82 @@
 import json
+from datetime import datetime
 
 def ShowMenu():
-    print("\nMenu:\n1. Add Task\n2. View Tasks\n3. Mark Task as Complete\n4. Update Task\n5. Delete Task\n6. View Tasks by Priority\n7. Exit")
+    print("\nMenu:\n1. Add Task\n2. View Tasks\n3. Mark Task Complete\n4. Update Task\n5. Delete Task\n6. View Tasks by Priority\n7. Exit")
     print("Please select an option:")
+
+#validating date
+def validateDate(date_str):
+    try:
+        date_obj = datetime.strptime(date_str, "%d-%m-%Y")
+
+        if date_obj.date() < datetime.today().date():
+            print("Due date cannot be in the past.")
+            return False
+
+        return True
+
+    except ValueError:
+        print("Invalid date format. Use DD-MM-YYYY.")
+        return False
+    
+
+def printTask(taskName, status, index):
+    print(f"\n{index}. {taskName}")
+    print(f"   Status   : {status['status']}")
+    print(f"   Priority : {status['priority']}")
+    print(f"   Due Date : {status['due_date']}")
+
+    if status["status"] == "Complete":
+        print("   Remaining: Completed")
+    else:
+        days_left = getDaysLeft(status["due_date"])
+
+        if days_left == 0:
+            print("   Remaining: Due Today")
+        elif days_left == 1:
+            print("   Remaining: 1 day")
+        else:
+            print(f"   Remaining: {days_left} days")
+
+
+def getDaysLeft(due_date):
+    return (
+        datetime.strptime(due_date, "%d-%m-%Y").date()
+        - datetime.today().date()
+    ).days
+    
 #adding Task
 def addTask(task):
     taskName = input("Enter the task name: ")
+
     if taskName.strip() == "":
         print("Task name cannot be empty. Please enter a valid name.")
         return
+
     if taskName in task:
         print("Task already exists. Please choose a different name.")
         return
+
     taskPriority = input("Enter the task priority (High/Medium/Low): ")
+
     if taskPriority not in ["High", "Medium", "Low"]:
         print("Invalid priority. Please enter 'High', 'Medium', or 'Low'.")
         return
-    task[taskName] = {"status": "Incomplete", "priority": taskPriority}
-    print("Task added successfully.")
+
+    due_date = input("Enter the task due date (DD-MM-YYYY): ")
+
+    if not validateDate(due_date):
+        return
+
+    task[taskName] = {
+        "status": "Incomplete",
+        "priority": taskPriority,
+        "due_date": due_date
+    }
+
     saveTasks(task)
+    print("Task added successfully.")
 
 #displaying Task
 def displayTasks(task):
@@ -28,9 +86,7 @@ def displayTasks(task):
     else:
         i=1
         for taskName, status in task.items():
-            print(i,"Task Name:", taskName)
-            print(f"   Status: {status['status']}")
-            print(f"   Priority: {status['priority']}")
+            printTask(taskName, status, i)
             i += 1
     
 
@@ -49,19 +105,23 @@ def markTaskComplete(task):
 def updateTask(task):
     taskName = input("Enter the task name to update: ")
     if taskName in task:
-        print("\nWhat do you want to update?\n1. Task Name\n2. Task Priority")
+        print("\nWhat do you want to update?\n1. Task Name\n2. Task Priority\n3. Due Date")
         choice = input("Enter your choice: ")
+
         if choice == "1":
             newTaskName = input("Enter the new task name: ")
             if newTaskName.strip() == "":
                 print("Task name cannot be empty. Please enter a valid name.")
                 return
-            if newTaskName not in task:
+            if newTaskName == taskName:
+                print("New task name is the same as the current name.")
+            elif newTaskName in task:
+                print("Task name already exists.")
+            else:
                 task[newTaskName] = task.pop(taskName)
                 saveTasks(task)
                 print("Task name updated successfully.")
-            else:
-                print("Task name already exists.")
+
         elif choice == "2":
             newPriority = input("Enter the new priority (High/Medium/Low): ")
             if newPriority in ["High", "Medium", "Low"]:
@@ -70,6 +130,16 @@ def updateTask(task):
                 print("Task priority updated successfully.")
             else:
                 print("Invalid priority. Please enter 'High', 'Medium', or 'Low'.")
+
+        elif choice == "3":
+            newDueDateStr = input("Enter the new due date (DD-MM-YYYY): ")
+            if not validateDate(newDueDateStr):
+                return
+            task[taskName]["due_date"] = newDueDateStr
+            saveTasks(task)
+            print("Task due date updated successfully.")
+        else:
+            print("Invalid choice. Please select 1, 2, or 3.")
     else:
         print("Task not found.")
 
@@ -92,9 +162,7 @@ def viewTasksByPriority(task):
             print(f"\nTasks with {priority} priority:")
             i=1
             for taskName, status in filteredTasks.items():
-                print(i,"Task Name:", taskName)
-                print(f"   Status: {status['status']}")
-                print(f"   Priority: {status['priority']}")
+                printTask(taskName, status, i)
                 i += 1
         else:
             print(f"No tasks with {priority} priority found.")
